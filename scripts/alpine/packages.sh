@@ -1,0 +1,86 @@
+#!/bin/bash
+
+# meant to be sourced
+
+package_list=(
+    bash
+    dash
+    clang
+    clang-dev
+    clang-extra-tools
+    g++ 
+    gcc
+    gfortran
+    make
+    cmake
+    ninja
+    m4
+    autoconf
+    automake
+    pkgconf
+    flex
+    bison
+    file
+    findutils
+    coreutils
+    sed
+    grep
+    tar
+    unzip
+    xz
+    bzip2
+    lz4
+    zstd
+    pigz
+    wget
+    git
+    mercurial
+    openssh-client
+    rsync
+    netcat-openbsd
+    iproute2
+    iputils
+    tzdata
+    jq
+    python3
+    py3-pip
+    py3-setuptools
+    py3-wheel
+    py3-virtualenv
+    perl
+    ruby
+    ruby-bundler
+    nodejs
+    npm
+    yarn
+    openjdk17
+    tpm2-tss
+    tpm2-tss-dev
+    tpm2-tss-static
+    tpm2-tss-mu
+    tpm2-tss-esys
+    tpm2-tss-fapi
+    tpm2-tss-rc
+    bash-completion
+    git-lfs
+    curl
+    openssl
+    sqlite
+    sqlite-dev
+    openssl-dev
+    zip
+    unzip
+    xvfb
+    upx
+    patchelf
+    shellcheck
+    swig
+    sphinx
+    yq
+    yamllint
+    go
+    rustup
+    util-linux
+    util-linux-misc
+)
+
