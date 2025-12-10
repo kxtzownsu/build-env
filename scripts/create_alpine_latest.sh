@@ -20,6 +20,24 @@ fi
 
 mkdir -p "$ROOTFS_DIR"
 
+if [ "$ALPINE_ARCH" != "$(uname -m)" ]; then
+	echo "!! The system architecture ($(uname -m)) doesn't match the architecture provided ($ALPINE_ARCH). This will likely result in a Exec format error if not properly configured. Continue? !!"
+	read -rep "[y/N] " archresp
+	if [ "${archresp,,}" == "" ]; then
+		archresp="n"
+	fi
+
+	if [ "${archresp,,}" == "n" ]; then
+		echo " -- exiting! --"
+		exit 1
+	elif [ "${archresp,,}" == "y" ]; then
+		echo "You have been warned! Any bugs past here are not reportable. This building mode is not supported and will likely break."
+	else
+		echo "unknown response (${archresp}), exiting anyway. please use 'y' or 'n' next time."
+		exit 2
+	fi
+fi
+
 if [ -z "$REAL_VERSION_OVERRIDE" ]; then
 # first, we fetch the file list
 # then we parse that file list for the tar.gz for minirootfs
@@ -110,6 +128,14 @@ for ((i=${#mountpoints[@]}-1; i>=0; i--)); do
     umount "${ROOTFS_DIR}/${mountpoints[i]}"
 done
 
+rm -rf "${ROOTFS_DIR}/install_packages"
+cat <<EOF >> "${ROOTFS_DIR}/root/.bashrc"
+source /etc/profile
+source ~/.profile
+source ~/.bash_profile
+source /etc/bash/bashrc
+source /etc/bash/bash_completion.sh
+EOF
 chown -R root:root "${ROOTFS_DIR}"
 cd "${ROOTFS_DIR}"
 mkdir -p "${SCRIPT_DIR}/../Alpine/${ALPINE_ARCH}"
