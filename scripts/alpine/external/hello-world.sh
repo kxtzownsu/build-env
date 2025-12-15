@@ -15,3 +15,7 @@ pkg_extract() {
     tar -xzf "$BUILDENV_DIR/tmp/$pkg_name.tgz" -C "$BUILDENV_DIR/"
     rm -rf "$BUILDENV_DIR/tmp/$pkg_name.tgz"
 }
+
+pkg_postinst() {
+    :
+}

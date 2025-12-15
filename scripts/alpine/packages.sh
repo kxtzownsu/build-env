@@ -87,4 +87,5 @@ package_list=(
 # see scripts/alpine/external-pkgs.sh
 external_package_list=(
     hello-world
+    aarch64-linux-musl
 )

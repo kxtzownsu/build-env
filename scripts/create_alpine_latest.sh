@@ -139,6 +139,8 @@ EOF
 chown -R root:root "${ROOTFS_DIR}"
 cd "${ROOTFS_DIR}"
 mkdir -p "${SCRIPT_DIR}/../Alpine/${ALPINE_ARCH}"
+echo "Running post-installation scripts"
+bash "${SCRIPT_DIR}/alpine/external-pkgs.sh" "${ROOTFS_DIR}" "--postinst"
 echo "Compressing final image"
 tar -czf "${SCRIPT_DIR}/../Alpine/${ALPINE_ARCH}/Alpine-${ALPINE_REAL_VERSION}.tgz" .
 cd "${SCRIPT_DIR}/../"
