@@ -84,3 +84,7 @@ package_list=(
     util-linux-misc
 )
 
+# see scripts/alpine/external-pkgs.sh
+external_package_list=(
+    hello-world
+)

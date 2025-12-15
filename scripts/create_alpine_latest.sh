@@ -103,6 +103,7 @@ EOF
 chmod +x "${ROOTFS_DIR}/install-packages"
 
 chroot "${ROOTFS_DIR}" "/install-packages"
+bash "${SCRIPT_DIR}/alpine/external-pkgs.sh" "${ROOTFS_DIR}"
 
 # all roads lead to rome
 pids=$(lsof +D "$ROOTFS_DIR" 2>/dev/null | awk 'NR>1 {print $2}' | sort -u)
@@ -132,13 +133,13 @@ rm -rf "${ROOTFS_DIR}/install_packages"
 cat <<EOF >> "${ROOTFS_DIR}/root/.bashrc"
 source /etc/profile
 source ~/.profile
-source ~/.bash_profile
 source /etc/bash/bashrc
 source /etc/bash/bash_completion.sh
 EOF
 chown -R root:root "${ROOTFS_DIR}"
 cd "${ROOTFS_DIR}"
 mkdir -p "${SCRIPT_DIR}/../Alpine/${ALPINE_ARCH}"
+echo "Compressing final image"
 tar -czf "${SCRIPT_DIR}/../Alpine/${ALPINE_ARCH}/Alpine-${ALPINE_REAL_VERSION}.tgz" .
 cd "${SCRIPT_DIR}/../"
 echo "Final image built at $(realpath "${SCRIPT_DIR}/../Alpine/${ALPINE_ARCH}/Alpine-${ALPINE_REAL_VERSION}.tgz")"
