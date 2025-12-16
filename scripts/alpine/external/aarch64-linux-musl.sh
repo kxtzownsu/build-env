@@ -22,4 +22,34 @@ pkg_postinst(){
     [ "$(uname -m)" != "x86_64" ] && echo "host arch not x86_64, unable to install $pkg_name" && return 1
     BUILDENV_DIR="$1"
     echo 'export PATH=/opt/cross/aarch64-linux-musl-cross/bin:$PATH' >> "${BUILDENV_DIR}/root/.bashrc"
+    
+    # you never know, extract could've failed or our postinst is broken
+    # prevent the postinst script from failing
+    mkdir -p "$BUILDENV_DIR/opt/cross/aarch64-linux-musl-cross/bin"
+    cat <<EOF > "${BUILDENV_DIR}/opt/cross/aarch64-linux-musl-cross/bin/aarch64-linux-musl-pkg-config"
+#!/bin/sh
+PKG_CONFIG_LIBDIR=/opt/cross/aarch64-linux-musl-cross/aarch64-linux-musl/lib/pkgconfig \
+PKG_CONFIG_SYSROOT_DIR=/opt/cross/aarch64-linux-musl-cross/aarch64-linux-musl \
+pkg-config "$@"
+
+EOF
+
+    chmod +x "${BUILDENV_DIR}/opt/cross/aarch64-linux-musl-cross/bin/aarch64-linux-musl-pkg-config"
+    cat <<EOF > "${BUILDENV_DIR}/opt/cross/aarch64-linux-musl-cross/aarch64-linux-musl-cross-file"
+[binaries]
+c = '/opt/cross/aarch64-linux-musl-cross/bin/aarch64-linux-musl-gcc'
+cpp = '/opt/cross/aarch64-linux-musl-cross/bin/aarch64-linux-musl-g++'
+ar = '/opt/cross/aarch64-linux-musl-cross/bin/aarch64-linux-musl-ar'
+pkgconfig = '/opt/cross/aarch64-linux-musl-cross/bin/aarch64-linux-musl-pkg-config'
+
+[host_machine]
+system = 'linux'
+cpu_family = 'aarch64'
+cpu = 'aarch64'
+endian = 'little'
+
+[properties]
+needs_exe_wrapper = true
+sys_root = '/opt/cross/aarch64-linux-musl-cross/aarch64-linux-musl'
+EOF
 }
