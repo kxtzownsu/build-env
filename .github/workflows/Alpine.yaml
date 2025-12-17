@@ -44,8 +44,10 @@ jobs:
         id: artifact
         run: |
           file=$(ls -1 Alpine/${{ matrix.arch }}/Alpine-*.tgz | sort -V | tail -1)
-          echo "file=$file" >> $GITHUB_OUTPUT
-          echo "name=$(basename "$file")" >> $GITHUB_OUTPUT
+          echo "${file##*/}" | sed -e 's/^Alpine-//' -e 's/\.tgz$//' > ./alpine-version
+          mv "$file" Alpine/${{matrix.arch }}/Alpine.tgz
+          echo "file=Alpine/${{matrix.arch }}/Alpine.tgz" >> $GITHUB_OUTPUT
+          echo "name=Alpine.tgz" >> $GITHUB_OUTPUT
 
       - name: create or update latest tag
         run: |
@@ -60,10 +62,12 @@ jobs:
           tag=alpine-${{ matrix.arch }}-latest
           name=alpine-${{ matrix.arch }}-latest
 
+          notes="auto-built from commit $GITHUB_SHA, built using Alpine v$(cat ./alpine-version) "
+
           if gh release view "$tag" >/dev/null 2>&1; then
-            gh release edit "$tag" --title "$name" --notes "auto-built from commit $GITHUB_SHA"
+            gh release edit "$tag" --title "$name" --notes "$notes"
           else
-            gh release create "$tag" --title "$name" --notes "auto-built from commit $GITHUB_SHA"
+            gh release create "$tag" --title "$name" --notes "$notes"
           fi
 
       - name: replace release asset

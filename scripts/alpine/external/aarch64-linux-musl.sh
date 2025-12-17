@@ -7,15 +7,15 @@ pkg_download() {
     [ "$(uname -m)" != "x86_64" ] && echo "host arch not x86_64, unable to install $pkg_name" && return 1
     BUILDENV_DIR="$1"
     mkdir -p "$BUILDENV_DIR/tmp"
-    wget -O "$BUILDENV_DIR/tmp/$pkg_name.tgz" "$pkg_url"
+    wget -O "$BUILDENV_DIR/tmp/$pkg_name.tar.xz" "$pkg_url"
 }
 
 pkg_extract() {
     [ "$(uname -m)" != "x86_64" ] && echo "host arch not x86_64, unable to install $pkg_name" && return 1
     BUILDENV_DIR="$1"
     mkdir -p "$BUILDENV_DIR/opt/cross"
-    tar -xzf "$BUILDENV_DIR/tmp/$pkg_name.tgz" -C "$BUILDENV_DIR/opt/cross/"
-    rm -f "$BUILDENV_DIR/tmp/$pkg_name.tgz"
+    tar -xzf "$BUILDENV_DIR/tmp/$pkg_name.tar.xz" -C "$BUILDENV_DIR/opt/cross/"
+    rm -f "$BUILDENV_DIR/tmp/$pkg_name.tar.xz"
 }
 
 pkg_postinst(){
