@@ -14,7 +14,7 @@ pkg_extract() {
     [ "$(uname -m)" != "aarch64" ] && echo "host arch not aarch64, unable to install $pkg_name" && return 1
     BUILDENV_DIR="$1"
     mkdir -p "$BUILDENV_DIR/opt/cross"
-    tar -xzf "$BUILDENV_DIR/tmp/$pkg_name.tar.xz" -C "$BUILDENV_DIR/opt/cross/"
+    tar -xJf "$BUILDENV_DIR/tmp/$pkg_name.tar.xz" -C "$BUILDENV_DIR/opt/cross/"
     rm -f "$BUILDENV_DIR/tmp/$pkg_name.tar.xz"
 }
 
