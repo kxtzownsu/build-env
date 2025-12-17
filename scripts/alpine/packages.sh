@@ -82,9 +82,11 @@ package_list=(
     rustup
     util-linux
     util-linux-misc
+    meson
 )
 
 # see scripts/alpine/external-pkgs.sh
+# hello-world is required due to it being a somewhat-reliable resource to see if a build-env is installed or not.
 external_package_list=(
     hello-world
     aarch64-linux-musl
