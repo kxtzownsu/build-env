@@ -21,7 +21,7 @@ jobs:
       - name: install deps
         run: |
           sudo apt-get update
-          sudo apt-get install -y curl wget tar jq docker.io qemu-user-static
+          sudo apt-get install -y curl wget tar jq qemu-user-static
 
       - name: setup qemu for non-x86_64
         if: matrix.arch != 'x86_64'
