@@ -1,7 +1,7 @@
 #!/bin/bash
 
 pkg_name="hello_world"
-pkg_url="https://github.com/kxtzownsu/build-env/raw/refs/heads/main/scripts/alpine/external/hello-world.tgz"
+pkg_url="https://github.com/kxtzownsu/build-env/raw/refs/heads/main/scripts/alpine/external/pkgs/hello-world.tgz"
 
 pkg_download() {
     BUILDENV_DIR="$1"

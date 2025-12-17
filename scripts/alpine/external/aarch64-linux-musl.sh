@@ -1,7 +1,7 @@
 #!/bin/bash
 
 pkg_name="aarch64_linux_musl"
-pkg_url="https://more.musl.cc/11.2.1/x86_64-linux-musl/aarch64-linux-musl-cross.tgz"
+pkg_url="https://github.com/kxtzownsu/build-env/raw/refs/heads/main/scripts/alpine/external/pkgs/aarch64-linux-musl-cross.tgz"
 
 pkg_download() {
     [ "$(uname -m)" != "x86_64" ] && echo "host arch not x86_64, unable to install $pkg_name" && return 1
