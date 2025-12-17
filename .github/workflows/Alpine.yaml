@@ -45,7 +45,7 @@ jobs:
         run: |
           file=$(ls -1 Alpine/${{ matrix.arch }}/Alpine-*.tgz | sort -V | tail -1)
           echo "${file##*/}" | sed -e 's/^Alpine-//' -e 's/\.tgz$//' > ./alpine-version
-          mv "$file" Alpine/${{matrix.arch }}/Alpine.tgz
+          sudo mv "$file" Alpine/${{matrix.arch }}/Alpine.tgz
           echo "file=Alpine/${{matrix.arch }}/Alpine.tgz" >> $GITHUB_OUTPUT
           echo "name=Alpine.tgz" >> $GITHUB_OUTPUT
 
