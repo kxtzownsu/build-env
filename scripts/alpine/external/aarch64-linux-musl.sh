@@ -30,7 +30,7 @@ pkg_postinst(){
 #!/bin/sh
 PKG_CONFIG_LIBDIR=/opt/cross/aarch64-linux-musl-cross/aarch64-linux-musl/lib/pkgconfig \
 PKG_CONFIG_SYSROOT_DIR=/opt/cross/aarch64-linux-musl-cross/aarch64-linux-musl \
-pkg-config "$@"
+pkg-config "\$@"
 
 EOF
 
