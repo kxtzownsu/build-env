@@ -2,6 +2,15 @@
 
 source "$(dirname "$0")/packages.sh"
 BUILDENV_DIR="$1"
+ALPINE_VER="$3"
+
+# cross-compilers expect this for linux headers
+# e.g: 3.23.2 -> 3.23
+if [ ! -z "$ALPINE_VER" ]; then
+    export ALPINE_VERSION="v$ALPINE_VER"
+else
+    export ALPINE_VERSION=""
+fi
 
 if [ "$2" == "--postinst" ]; then
     for pkg in "${external_package_list[@]}"; do
@@ -14,7 +23,7 @@ if [ "$2" == "--postinst" ]; then
         pkg_postinst "$BUILDENV_DIR"
     done
     exit 0
-else
+else if [ "$2" == "--install" ]; then
     for pkg in "${external_package_list[@]}"; do
         pkg_script="$(dirname "$0")/external/${pkg}.sh"
 

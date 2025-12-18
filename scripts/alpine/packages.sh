@@ -90,4 +90,5 @@ package_list=(
 external_package_list=(
     hello-world
     aarch64-linux-musl
+    x86_64-linux-musl
 )
