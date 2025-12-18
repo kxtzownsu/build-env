@@ -23,7 +23,7 @@ if [ "$2" == "--postinst" ]; then
         pkg_postinst "$BUILDENV_DIR"
     done
     exit 0
-else if [ "$2" == "--install" ]; then
+elif [ "$2" == "--install" ]; then
     for pkg in "${external_package_list[@]}"; do
         pkg_script="$(dirname "$0")/external/${pkg}.sh"
 
