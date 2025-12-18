@@ -29,6 +29,7 @@ pkg_postinst(){
     BUILDENV_DIR="$1"
     echo 'export PATH=/opt/cross/aarch64-linux-musl/bin:$PATH' >> "${BUILDENV_DIR}/root/.bashrc"
 
+    mkdir -p "${BUILDENV_DIR}/opt/cross/aarch64-linux-musl/usr"
     ln -sf "/opt/cross/aarch64-linux-musl/aarch64-linux-musl" "${BUILDENV_DIR}/opt/cross/aarch64-linux-musl/usr"
     
     mkdir -p "$BUILDENV_DIR/opt/cross/aarch64-linux-musl/bin"
