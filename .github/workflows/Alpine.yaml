@@ -21,7 +21,7 @@ jobs:
       - name: install deps
         run: |
           sudo apt-get update
-          sudo apt-get install -y bsdtar curl wget tar jq qemu-user-static
+          sudo apt-get install -y curl wget tar jq qemu-user-static
 
       - name: setup qemu for non-x86_64
         if: matrix.arch != 'x86_64'
@@ -34,7 +34,7 @@ jobs:
           chmod +x scripts/create_alpine_latest.sh
           if [ "${{ matrix.arch }}" != "x86_64" ]; then
               docker run --rm --platform "linux/${{ matrix.arch }}" -v $PWD:/work -w /work ubuntu:22.04 \
-                  bash -c "apt update && apt install -y curl wget tar bsdtar && ./scripts/create_alpine_latest.sh ${{ matrix.arch }}"
+                  bash -c "apt update && apt install -y curl wget tar && ./scripts/create_alpine_latest.sh ${{ matrix.arch }}"
           else
               ./scripts/create_alpine_latest.sh x86_64
           fi

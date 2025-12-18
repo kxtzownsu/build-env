@@ -66,6 +66,6 @@ EOF
     pkg_name=$(wget -qO- "$apk_index" | grep -o 'linux-headers-[^"]*\.apk' | sort -V | tail -n1)
     wget -O "$tmpdir/linux-headers.apk" "${apk_index}${pkg_name}"
 
-    bsdtar -xf "$tmpdir/linux-headers.apk" -C "$BUILDENV_DIR/opt/cross/aarch64-linux-musl"
+    tar -xf "$tmpdir/linux-headers.apk" -C "$BUILDENV_DIR/opt/cross/aarch64-linux-musl"
     rm -rf "$tmpdir"
 }
