@@ -103,7 +103,7 @@ EOF
 chmod +x "${ROOTFS_DIR}/install-packages"
 
 chroot "${ROOTFS_DIR}" "/install-packages"
-bash "${SCRIPT_DIR}/alpine/external-pkgs.sh" "${ROOTFS_DIR}"
+bash "${SCRIPT_DIR}/alpine/external-pkgs.sh" "${ROOTFS_DIR}" "--install"
 
 # all roads lead to rome
 pids=$(lsof +D "$ROOTFS_DIR" 2>/dev/null | awk 'NR>1 {print $2}' | sort -u)
