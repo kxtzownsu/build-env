@@ -35,8 +35,9 @@ pkg_postinst(){
     mkdir -p "$BUILDENV_DIR/opt/cross/x86_64-linux-musl/bin"
     cat <<EOF > "${BUILDENV_DIR}/opt/cross/x86_64-linux-musl/bin/x86_64-linux-musl-pkg-config"
 #!/bin/sh
-PKG_CONFIG_LIBDIR=/opt/cross/x86_64-linux-musl/x86_64-linux-musl/lib/pkgconfig \
-PKG_CONFIG_SYSROOT_DIR=/opt/cross/x86_64-linux-musl/x86_64-linux-musl \
+export PKG_CONFIG_LIBDIR=/opt/cross/x86_64-linux-musl/x86_64-linux-musl/lib/pkgconfig
+export PKG_CONFIG_SYSROOT_DIR=/opt/cross/x86_64-linux-musl/x86_64-linux-musl
+export PKG_CONFIG_PATH=/opt/cross/x86_64-linux-musl/x86_64-linux-musl/lib/pkgconfig
 pkg-config "\$@"
 EOF
     chmod +x "${BUILDENV_DIR}/opt/cross/x86_64-linux-musl/bin/x86_64-linux-musl-pkg-config"
