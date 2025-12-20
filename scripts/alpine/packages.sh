@@ -83,6 +83,11 @@ package_list=(
     util-linux
     util-linux-misc
     meson
+    linux-headers
+    libdrm-dev
+    build-base
+    musl-dev
+    rdma-core-dev
 )
 
 # see scripts/alpine/external-pkgs.sh
