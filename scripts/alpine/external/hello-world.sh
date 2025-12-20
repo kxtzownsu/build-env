@@ -6,7 +6,7 @@ pkg_url="https://github.com/kxtzownsu/build-env/raw/refs/heads/main/scripts/alpi
 pkg_download() {
     BUILDENV_DIR="$1"
     echo "downloading $pkg_name..."
-    wget -O "$BUILDENV_DIR/tmp/$pkg_name.tgz" "$pkg_url"
+    wget -q --show-progress -O "$BUILDENV_DIR/tmp/$pkg_name.tgz" "$pkg_url"
 }
 
 pkg_extract() {

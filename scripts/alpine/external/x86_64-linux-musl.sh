@@ -13,7 +13,7 @@ pkg_download() {
     [ "$(uname -m)" != "aarch64" ] && echo "host arch not aarch64, unable to install $pkg_name" && return 1
     BUILDENV_DIR="$1"
     mkdir -p "$BUILDENV_DIR/tmp"
-    wget -O "$BUILDENV_DIR/tmp/$pkg_name.tar.xz" "$pkg_url"
+    wget -q --show-progress -O "$BUILDENV_DIR/tmp/$pkg_name.tar.xz" "$pkg_url"
 }
 
 pkg_extract() {
@@ -48,6 +48,7 @@ c = '/opt/cross/x86_64-linux-musl/bin/x86_64-linux-musl-gcc'
 cpp = '/opt/cross/x86_64-linux-musl/bin/x86_64-linux-musl-g++'
 ar = '/opt/cross/x86_64-linux-musl/bin/x86_64-linux-musl-ar'
 pkgconfig = '/opt/cross/x86_64-linux-musl/bin/x86_64-linux-musl-pkg-config'
+pkg-config = '/opt/cross/x86_64-linux-musl/bin/x86_64-linux-musl-pkg-config'
 
 [host_machine]
 system = 'linux'
@@ -66,8 +67,8 @@ EOF
 
     apk_index="https://dl-cdn.alpinelinux.org/alpine/${ALPINE_VERSION}/main/aarch64/"
     pkg_name=$(wget -qO- "$apk_index" | grep -o 'linux-headers-[^"]*\.apk' | sort -V | tail -n1)
-    wget -O "$tmpdir/linux-headers.apk" "${apk_index}${pkg_name}"
+    wget -q --show-progress -O "$tmpdir/linux-headers.apk" "${apk_index}${pkg_name}"
 
-    tar -xf "$tmpdir/linux-headers.apk" -C "$BUILDENV_DIR/opt/cross/x86_64-linux-musl"
+    tar -xf "$tmpdir/linux-headers.apk" -C "$BUILDENV_DIR/opt/cross/x86_64-linux-musl" 2> >(grep -v "APK-TOOLS.checksum.SHA1" >&2)
     rm -rf "$tmpdir"
 }

@@ -56,7 +56,7 @@ fi
 MINIROOTFS_FILE_NAME="alpine-minirootfs-${ALPINE_REAL_VERSION}-${ALPINE_ARCH}.tar.gz"
 
 if [ "$ARE_WE_SKIPPING_DOWNLOAD_AND_EXTRACTION" != "yes" ]; then
-wget -O "${ROOTFS_DIR}/${MINIROOTFS_FILE_NAME}" "https://${ALPINE_DOMAIN}/${ALPINE_VERSION}/releases/${ALPINE_ARCH}/${MINIROOTFS_FILE_NAME}"
+wget -q --show-progress -O "${ROOTFS_DIR}/${MINIROOTFS_FILE_NAME}" "https://${ALPINE_DOMAIN}/${ALPINE_VERSION}/releases/${ALPINE_ARCH}/${MINIROOTFS_FILE_NAME}"
 tar -xzf "${ROOTFS_DIR}/${MINIROOTFS_FILE_NAME}" -C "${ROOTFS_DIR}"
 rm -rf "${ROOTFS_DIR}/${MINIROOTFS_FILE_NAME}"
 fi
@@ -93,8 +93,6 @@ cat <<EOF > "${ROOTFS_DIR}/install-packages"
 #!/bin/sh
 export PATH="/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin"
 echo "nameserver 1.1.1.1" > /etc/resolv.conf
-ping 1.1.1.1 -c3
-ping google.com -c3
 apk add ${package_list[@]}
 
 rustup-init -y
