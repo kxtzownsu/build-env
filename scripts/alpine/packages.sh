@@ -88,6 +88,7 @@ package_list=(
     build-base
     musl-dev
     rdma-core-dev
+    gettext
 )
 
 # see scripts/alpine/external-pkgs.sh
