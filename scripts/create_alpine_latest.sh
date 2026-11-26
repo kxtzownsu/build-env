@@ -77,6 +77,11 @@ fi
 
 ## from now on we have root permissions, be careful! ##
 
+if [ "${BUILDENV_CREATE_PRIVATE_NS:-0}" != "1" ]; then
+	exec unshare --mount --propagation private \
+		env BUILDENV_CREATE_PRIVATE_NS=1 bash "$0" "$@"
+fi
+
 mountpoints=(
 	/dev
 	/dev/pts
@@ -84,6 +89,17 @@ mountpoints=(
 	/proc
 	/run
 )
+
+cleanup_mounts(){
+	local i
+	for ((i=${#mountpoints[@]}-1; i>=0; i--)); do
+		mountpoint -q "${ROOTFS_DIR}/${mountpoints[i]}" || continue
+		umount "${ROOTFS_DIR}/${mountpoints[i]}" 2>/dev/null ||
+			umount -l "${ROOTFS_DIR}/${mountpoints[i]}" 2>/dev/null || true
+	done
+}
+
+trap cleanup_mounts EXIT HUP INT TERM
 
 for mountpoint in "${mountpoints[@]}"; do
 	mount --bind $mountpoint "${ROOTFS_DIR}/${mountpoint}"
@@ -96,6 +112,8 @@ echo "nameserver 1.1.1.1" > /etc/resolv.conf
 apk add ${package_list[@]}
 
 rustup-init -y
+export PATH="$HOME/.cargo/bin:$PATH"
+rustup target add x86_64-unknown-linux-musl aarch64-unknown-linux-musl
 EOF
 
 chmod +x "${ROOTFS_DIR}/install-packages"

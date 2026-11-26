@@ -20,6 +20,7 @@ package_list=(
     pkgconf
     flex
     bison
+    bc
     file
     findutils
     coreutils
@@ -48,6 +49,11 @@ package_list=(
     py3-wheel
     py3-virtualenv
     perl
+    lld
+    llvm
+    elfutils-dev
+    pahole
+    kmod
     ruby
     ruby-bundler
     nodejs
