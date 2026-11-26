@@ -19,8 +19,10 @@ if [ "$2" == "--postinst" ]; then
         unset pkg_download pkg_extract pkg_name pkg_url
 
         source "$pkg_script"
-
-        pkg_postinst "$BUILDENV_DIR"
+        pkg_postinst "$BUILDENV_DIR" || {
+            echo "post-install failed: $pkg"
+            exit 1
+        }
     done
     exit 0
 elif [ "$2" == "--install" ]; then
@@ -30,9 +32,14 @@ elif [ "$2" == "--install" ]; then
         unset pkg_download pkg_extract pkg_name pkg_url
 
         source "$pkg_script"
-
-        pkg_download "$BUILDENV_DIR"
-        pkg_extract "$BUILDENV_DIR"
+        pkg_download "$BUILDENV_DIR" || {
+            echo "download failed: $pkg"
+            exit 1
+        }
+        pkg_extract "$BUILDENV_DIR" || {
+            echo "extract failed: $pkg"
+            exit 1
+        }
     done
     exit 0
 fi

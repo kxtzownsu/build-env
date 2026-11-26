@@ -1,6 +1,11 @@
 #!/bin/bash
 SCRIPT_DIR="$(realpath "$(dirname "$0")")"
 
+die() {
+	echo "ERROR: $*" >&2
+	exit 1
+}
+
 source "${SCRIPT_DIR}/alpine/packages.sh"
 source "${SCRIPT_DIR}/common.sh"
 
@@ -53,11 +58,15 @@ else
 	ALPINE_VERSION="v${REAL_VERSION_OVERRIDE%.*}"
 fi
 
+[ -n "$ALPINE_REAL_VERSION" ] || die "failed to resolve the Alpine version for ${ALPINE_ARCH}"
+
 MINIROOTFS_FILE_NAME="alpine-minirootfs-${ALPINE_REAL_VERSION}-${ALPINE_ARCH}.tar.gz"
 
 if [ "$ARE_WE_SKIPPING_DOWNLOAD_AND_EXTRACTION" != "yes" ]; then
-wget -q --show-progress -O "${ROOTFS_DIR}/${MINIROOTFS_FILE_NAME}" "https://${ALPINE_DOMAIN}/${ALPINE_VERSION}/releases/${ALPINE_ARCH}/${MINIROOTFS_FILE_NAME}"
-tar -xzf "${ROOTFS_DIR}/${MINIROOTFS_FILE_NAME}" -C "${ROOTFS_DIR}"
+wget -q --show-progress -O "${ROOTFS_DIR}/${MINIROOTFS_FILE_NAME}" "https://${ALPINE_DOMAIN}/${ALPINE_VERSION}/releases/${ALPINE_ARCH}/${MINIROOTFS_FILE_NAME}" \
+	|| die "failed to download ${MINIROOTFS_FILE_NAME}"
+tar -xzf "${ROOTFS_DIR}/${MINIROOTFS_FILE_NAME}" -C "${ROOTFS_DIR}" \
+	|| die "failed to extract ${MINIROOTFS_FILE_NAME}"
 rm -rf "${ROOTFS_DIR}/${MINIROOTFS_FILE_NAME}"
 fi
 
@@ -102,24 +111,43 @@ cleanup_mounts(){
 trap cleanup_mounts EXIT HUP INT TERM
 
 for mountpoint in "${mountpoints[@]}"; do
-	mount --bind $mountpoint "${ROOTFS_DIR}/${mountpoint}"
+	mount --bind $mountpoint "${ROOTFS_DIR}/${mountpoint}" \
+		|| die "failed to bind mount ${mountpoint}"
 done
 
 cat <<EOF > "${ROOTFS_DIR}/install-packages"
 #!/bin/sh
+set -e
+export HOME=/root
 export PATH="/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin"
 echo "nameserver 1.1.1.1" > /etc/resolv.conf
 apk add ${package_list[@]}
 
 rustup-init -y
-export PATH="$HOME/.cargo/bin:$PATH"
+export PATH="\$HOME/.cargo/bin:\$PATH"
 rustup target add x86_64-unknown-linux-musl aarch64-unknown-linux-musl
 EOF
 
 chmod +x "${ROOTFS_DIR}/install-packages"
 
-chroot "${ROOTFS_DIR}" "/install-packages"
-bash "${SCRIPT_DIR}/alpine/external-pkgs.sh" "${ROOTFS_DIR}" "--install"
+chroot "${ROOTFS_DIR}" "/install-packages" || die "package installation failed"
+bash "${SCRIPT_DIR}/alpine/external-pkgs.sh" "${ROOTFS_DIR}" "--install" \
+	|| die "external package installation failed"
+
+for required in \
+	usr/bin/rustup-init \
+	usr/bin/xz \
+	usr/bin/clang \
+	usr/bin/ld.lld \
+	usr/bin/pahole \
+	usr/bin/git; do
+	[ -e "${ROOTFS_DIR}/${required}" ] || die "missing ${required} in rootfs"
+done
+
+for target in x86_64-unknown-linux-musl aarch64-unknown-linux-musl; do
+	ls -d "${ROOTFS_DIR}"/root/.rustup/toolchains/*/lib/rustlib/"${target}" >/dev/null 2>&1 \
+		|| die "missing Rust target ${target} in rootfs"
+done
 
 # all roads lead to rome
 pids=$(lsof +D "$ROOTFS_DIR" 2>/dev/null | awk 'NR>1 {print $2}' | sort -u)
@@ -142,10 +170,13 @@ fi
 
 # reverse it because we want to unmount /dev/pts before /dev
 for ((i=${#mountpoints[@]}-1; i>=0; i--)); do
-    umount "${ROOTFS_DIR}/${mountpoints[i]}"
+    mountpoint -q "${ROOTFS_DIR}/${mountpoints[i]}" || continue
+    umount "${ROOTFS_DIR}/${mountpoints[i]}" \
+        || umount -l "${ROOTFS_DIR}/${mountpoints[i]}" \
+        || die "failed to unmount ${ROOTFS_DIR}/${mountpoints[i]}"
 done
 
-rm -rf "${ROOTFS_DIR}/install_packages"
+rm -rf "${ROOTFS_DIR}/install-packages"
 cat <<EOF >> "${ROOTFS_DIR}/root/.bashrc"
 source /etc/profile
 source ~/.profile
@@ -153,13 +184,18 @@ source /etc/bash/bashrc
 source /etc/bash/bash_completion.sh
 EOF
 chown -R root:root "${ROOTFS_DIR}"
-cd "${ROOTFS_DIR}"
+cd "${ROOTFS_DIR}" || die "failed to enter ${ROOTFS_DIR}"
 mkdir -p "${SCRIPT_DIR}/../Alpine/${ALPINE_ARCH}"
 echo "Running post-installation scripts"
-bash "${SCRIPT_DIR}/alpine/external-pkgs.sh" "${ROOTFS_DIR}" "--postinst"
+bash "${SCRIPT_DIR}/alpine/external-pkgs.sh" "${ROOTFS_DIR}" "--postinst" \
+	|| die "external post-installation failed"
 echo "Compressing final image"
-tar -czf "${SCRIPT_DIR}/../Alpine/${ALPINE_ARCH}/Alpine-${ALPINE_REAL_VERSION}.tgz" .
-cd "${SCRIPT_DIR}/../"
-echo "Final image built at $(realpath "${SCRIPT_DIR}/../Alpine/${ALPINE_ARCH}/Alpine-${ALPINE_REAL_VERSION}.tgz")"
+tarball="$(realpath -m "${SCRIPT_DIR}/../Alpine/${ALPINE_ARCH}/Alpine-${ALPINE_REAL_VERSION}.tgz")"
+if ! tar -czf "$tarball" .; then
+	rm -f "$tarball"
+	die "failed to create $(basename "$tarball")"
+fi
+cd "${SCRIPT_DIR}/../" || die "failed to return to build directory"
+echo "Final image built at ${tarball}"
 echo "-- doing cleanup --"
 rm -rf "${ROOTFS_DIR}" 

@@ -81,8 +81,8 @@ package_list=(
     patchelf
     shellcheck
     swig
-    sphinx
-    yq
+    py3-sphinx
+    yq-go
     yamllint
     go
     rustup
